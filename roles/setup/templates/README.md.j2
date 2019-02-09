@@ -1,0 +1,54 @@
+# {{ config_name }} Configuration
+
+## Required Setup Before Running Terragrunt
+
+If Terragrunt has not been run in this AWS account before, you **must** bootstrap a `terragrunt` IAM user/role/policy in the account first.
+
+1. Log into the AWS console with an administrator-level user on the AWS account.
+1. Create a `terragrunt` user. Allow programmatic access and disallow console access.
+1. Note the `terragrunt` user's ARN.
+1. Add the access key and secret access key for the `terragrunt` user to your local AWS credentials file.
+1. If an administrator-level user for the AWS account with programmatic access does not already exist, create one. (This user can be temporary, just to run the next three steps.)
+1. Export the environment variable `AWS_ACCESS_KEY_ID=change-to-administrator-level-user-key`
+1. Export the environment variable `AWS_SECRET_ACCESS_KEY=change-to-administrator-level-user-secret-key`
+1. Apply the Terragrunt config at `{{ terragrunt_state_path }}` -- yes, we have to run Terragrunt before we can run Terragrunt, just trust it.
+
+This will create a `{{ config_name }}` role with an inline policy called `{{ config_name }}-state` in the IAM area of the AWS account. Verify these exist before continuing.
+
+Add the credentials for the `terragrunt` user to the AWS CLI. See the [Appendix](#appendix) for sample credential and config files.
+
+## Running Terragrunt
+
+**IMPORTANT:** Make sure you have completed the setup described in [Required Setup Before Running Terragrunt](#required-setup-before-running-terragrunt)!
+
+You must tell Terragrunt which AWS credential profile to run as.
+
+## Maintaining Remote State
+
+Terraform uses a statefile to keep track of the current state of the infrastructure. To allow multiple people to work with Terraform at the same time, and prevent conflicts between them, we use Terragrunt to store all statefiles remotely in S3, along with a DynamoDB table for statefile locking.
+
+* S3 bucket name: `{{ state_bucket_name }}`
+* DynamoDB table name: `{{ dynamodb_table_name }}`
+
+## Appendix
+
+### Sample AWS credentials file
+
+This file is usually located at `$HOME/.aws/credentials`
+
+```
+[osu-test-terragrunt]
+aws_access_key_id = CHANGEME
+aws_secret_access_key = CHANGEME
+```
+
+### Sample AWS config file
+
+This file is usually located at `$HOME/.aws/config`
+
+```
+[profile osu-test-terragrunt]
+region = us-west-2
+role_arn = arn:aws:iam::555555555555:role/osu-test-terragrunt
+source_profile = osu-test-terragrunt
+```

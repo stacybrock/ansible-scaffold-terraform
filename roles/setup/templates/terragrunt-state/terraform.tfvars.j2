@@ -1,0 +1,8 @@
+terragrunt = {
+  terraform {
+    source = "${get_tfvars_dir()}/../terraform-modules//terragrunt-state-role"
+  }
+}
+
+aws_region  = "{{ terragrunt_state.aws_region }}"
+config_name = "{{ item.value }}"

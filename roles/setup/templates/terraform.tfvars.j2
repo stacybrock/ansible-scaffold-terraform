@@ -1,0 +1,13 @@
+terragrunt = {
+  remote_state {
+    backend = "s3"
+    config {
+      bucket         = "{{ bucket_name }}"
+      profile        = "{{ aws_profile }}"
+      key            = "${path_relative_to_include()}/terraform.tfstate"
+      region         = "{{ terragrunt_state.aws_region }}"
+      encrypt        = true
+      dynamodb_table = "{{ dynamodb_table_name }}"
+    }
+  }
+}

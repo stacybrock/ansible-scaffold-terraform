@@ -1,0 +1,7 @@
+---
+terraform_config_home: /home/changeme/terraform
+configs:
+  project1: osu-project1-terraform
+  project2: osu-project2-terraform
+terragrunt_state:
+  aws_region: us-east-2
