@@ -35,7 +35,7 @@ resource "aws_iam_role_policy" "terragrunt_state_iam_policy" {
       "Effect": "Allow",
       "Action": "dynamodb:*",
       "Resource": [
-        "arn:aws:dynamodb:*:*:table/osu-da-dev-terragrunt-lock"
+        "arn:aws:dynamodb:*:*:table/{{ dynamodb_table_name }}"
       ]
     },
     {
@@ -43,8 +43,8 @@ resource "aws_iam_role_policy" "terragrunt_state_iam_policy" {
       "Effect": "Allow",
       "Action": "s3:*",
       "Resource": [
-        "arn:aws:s3:::osu-da-dev-terragrunt-state",
-        "arn:aws:s3:::osu-da-dev-terragrunt-state/*"
+        "arn:aws:s3:::{{ state_bucket_name }}",
+        "arn:aws:s3:::{{ state_bucket_name }}/*"
       ]
     }
   ]

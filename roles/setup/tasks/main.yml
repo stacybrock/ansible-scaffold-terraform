@@ -46,16 +46,19 @@
     path: "{{ terraform_config_home }}/{{ item.key }}/terraform-modules/terragrunt-state-role"
   loop: "{{ configs|dict2items }}"
 
-- name: copy terragrunt-state-role/input.tf
-  copy:
-    src: terragrunt-state-role/input.tf
+- name: create terragrunt-state-role/input.tf from template
+  template:
+    src: terragrunt-state-role/input.tf.j2
     dest: "{{ terraform_config_home }}/{{ item.key }}/terraform-modules/terragrunt-state-role/input.tf"
   loop: "{{ configs|dict2items }}"
 
-- name: copy terragrunt-state-role/main.tf
-  copy:
-    src: terragrunt-state-role/main.tf
+- name: create terragrunt-state-role/main.tf from template
+  template:
+    src: terragrunt-state-role/main.tf.j2
     dest: "{{ terraform_config_home }}/{{ item.key }}/terraform-modules/terragrunt-state-role/main.tf"
+  vars:
+    state_bucket_name: "{{ item.value }}-state"
+    dynamodb_table_name: "{{ item.value }}-lock"
   loop: "{{ configs|dict2items }}"
 
 - name: create README.md
