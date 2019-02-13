@@ -1,0 +1,8 @@
+terragrunt = {
+  terraform {
+    source = "${get_tfvars_dir()}/../terraform-modules//terragrunt-policies"
+  }
+}
+
+aws_region         = "us-east-2"
+terragrunt_role_id = "{{ config_name }}"

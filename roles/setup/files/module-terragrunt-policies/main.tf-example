@@ -1,0 +1,69 @@
+provider "aws" {
+  region = "${var.aws_region}"
+}
+
+resource "aws_iam_role_policy" "terragrunt_iam_policy" {
+  name = "${var.terragrunt_role_id}"
+  role = "${var.terragrunt_role_id}"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowTerragruntToManageEC2KeyPairs",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:ImportKeyPair",
+        "ec2:DeleteKeyPair"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "AllowTerragruntToAddIAMRolesAndPolicies",
+      "Effect": "Allow",
+      "Action": [
+        "iam:ListGroupPolicies",
+        "iam:ListEntitiesForPolicy",
+        "iam:ListRoles",
+        "iam:ListUserPolicies",
+        "iam:ListInstanceProfiles",
+        "iam:ListPolicyVersions",
+        "iam:ListGroupsForUser",
+        "iam:ListUsers",
+        "iam:ListGroups",
+        "iam:ListRoleTags",
+        "iam:ListPoliciesGrantingServiceAccess",
+        "iam:ListAttachedRolePolicies",
+        "iam:ListAttachedUserPolicies",
+        "iam:ListAttachedGroupPolicies",
+        "iam:ListRolePolicies",
+        "iam:ListPolicies",
+        "iam:ListInstanceProfilesForRole",
+        "iam:GetRole",
+        "iam:GetInstanceProfile",
+        "iam:GetUser",
+        "iam:GetRolePolicy",
+        "iam:CreateRole",
+        "iam:CreateInstanceProfile",
+        "iam:AttachRolePolicy",
+        "iam:PutRolePolicy",
+        "iam:AddRoleToInstanceProfile",
+        "iam:RemoveRoleFromInstanceProfile",
+        "iam:DeleteRolePolicy",
+        "iam:DeleteRole",
+        "iam:DeleteInstanceProfile"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
+# EXAMPLE: attach managed policy to role
+
+#resource "aws_iam_role_policy_attachment" "vpc_full" {
+#  role       = "${var.terragrunt_role_id}"
+#  policy_arn = "arn:aws:iam::aws:policy/AmazonVPCFullAccess"
+#}

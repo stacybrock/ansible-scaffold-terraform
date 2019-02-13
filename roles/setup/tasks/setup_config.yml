@@ -1,0 +1,95 @@
+---
+# set the 'config' var once so that we can use it to set even more vars
+- set_fact:
+    config: "{{ item.key }}"
+    config_name: "{{ item.value }}"
+
+- set_fact:
+    config_dir: "{{ terraform_config_home }}/{{ config }}"
+    state_bucket_name: "{{ config_name }}-state"
+    dynamodb_table_name: "{{ config_name }}-lock"
+
+- debug:
+    msg: "Scaffolding config for '{{ config_name }}'..."
+
+- name: create config dirs
+  file:
+    state: directory
+    path: "{{ config_dir }}"
+
+- name: create primary terraform.tfvars from template
+  template:
+    src: terraform.tfvars.j2
+    dest: "{{ config_dir }}/terraform.tfvars"
+
+- name: create README.md
+  template:
+    src: README.md.j2
+    dest: "{{ config_dir }}/README.md"
+  vars:
+    terragrunt_state_path: "{{ config_dir }}/{{ config_name }}-state"
+
+- name: create terraform state dir
+  file:
+    state: directory
+    path: "{{ config_dir }}/{{ config_name }}-state"
+
+- name: "create {{ config_name }}-state/terraform.tfvars from template"
+  template:
+    src: config-terragrunt-state/terraform.tfvars.j2
+    dest: "{{ config_dir }}/{{ config_name }}-state/terraform.tfvars"
+
+- name: "create {{ config_name }}-state/README.md from template"
+  template:
+    src: config-terragrunt-state/README.md.j2
+    dest: "{{ config_dir }}/{{ config_name }}-state/README.md"
+
+- name: create terraform modules dir
+  file:
+    state: directory
+    path: "{{ config_dir }}/terraform-modules"
+
+- name: create terragrunt-state-role module dir
+  file:
+    state: directory
+    path: "{{ config_dir }}/terraform-modules/terragrunt-state-role"
+
+- name: create terragrunt-state-role/input.tf from template
+  template:
+    src: module-terragrunt-state-role/input.tf.j2
+    dest: "{{ config_dir }}/terraform-modules/terragrunt-state-role/input.tf"
+
+- name: create terragrunt-state-role/main.tf from template
+  template:
+    src: module-terragrunt-state-role/main.tf.j2
+    dest: "{{ config_dir }}/terraform-modules/terragrunt-state-role/main.tf"
+
+- name: create terraform policies dir
+  file:
+    state: directory
+    path: "{{ config_dir }}/{{ config_name }}-policies"
+
+- name: "create {{ config_name }}-policies/terraform.tfvars from template"
+  template:
+    src: config-terragrunt-policies/terraform.tfvars.j2
+    dest: "{{ config_dir }}/{{ config_name }}-policies/terraform.tfvars"
+
+- name: "create {{ config_name }}-policies/README.md from template"
+  template:
+    src: config-terragrunt-policies/README.md.j2
+    dest: "{{ config_dir }}/{{ config_name }}-policies/README.md"
+
+- name: create terragrunt-policies module dir
+  file:
+    state: directory
+    path: "{{ config_dir }}/terraform-modules/terragrunt-policies"
+
+- name: copy terragrunt-policies/input.tf file
+  copy:
+    src: module-terragrunt-policies/input.tf
+    dest: "{{ config_dir }}/terraform-modules/terragrunt-policies/input.tf"
+
+- name: copy terragrunt-policies/main.tf-example file
+  copy:
+    src: module-terragrunt-policies/main.tf-example
+    dest: "{{ config_dir }}/terraform-modules/terragrunt-policies/main.tf-example"

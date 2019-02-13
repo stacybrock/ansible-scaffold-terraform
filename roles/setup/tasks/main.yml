@@ -2,72 +2,9 @@
 - name: create terraform home dir
   file:
     state: directory
-    path: " {{ terraform_config_home }}"
+    path: "{{ terraform_config_home }}"
 
-- name: create config dirs
-  file:
-    state: directory
-    path: "{{ terraform_config_home }}/{{ item.key }}"
-  with_dict: "{{ configs }}"
-
-- name: create terraform state dir
-  file:
-    state: directory
-    path: "{{ terraform_config_home }}/{{ item.key }}/{{ item.value }}-state"
-  with_dict: "{{ configs }}"
-
-- name: create state terraform.tfvars from template
-  template:
-    src: terragrunt-state/terraform.tfvars.j2
-    dest: "{{ terraform_config_home }}/{{ item.key }}/{{ item.value }}-state/terraform.tfvars"
-  vars:
-    bucket_name: "{{ item.value }}-state"
-  with_dict: "{{ configs }}"
-
-- name: create primary terraform.tfvars from template
-  template:
-    src: terraform.tfvars.j2
-    dest: "{{ terraform_config_home }}/{{ item.key }}/terraform.tfvars"
-  vars:
-    bucket_name: "{{ item.value }}-state"
-    aws_profile: "{{ item.value }}"
-    dynamodb_table_name: "{{ item.value }}-lock"
-  with_dict: "{{ configs }}"
-
-- name: create terraform modules dir
-  file:
-    state: directory
-    path: "{{ terraform_config_home }}/{{ item.key }}/terraform-modules"
+- include_tasks: setup_config.yml
   loop: "{{ configs|dict2items }}"
-
-- name: create terragrunt-state-role module dir
-  file:
-    state: directory
-    path: "{{ terraform_config_home }}/{{ item.key }}/terraform-modules/terragrunt-state-role"
-  loop: "{{ configs|dict2items }}"
-
-- name: create terragrunt-state-role/input.tf from template
-  template:
-    src: terragrunt-state-role/input.tf.j2
-    dest: "{{ terraform_config_home }}/{{ item.key }}/terraform-modules/terragrunt-state-role/input.tf"
-  loop: "{{ configs|dict2items }}"
-
-- name: create terragrunt-state-role/main.tf from template
-  template:
-    src: terragrunt-state-role/main.tf.j2
-    dest: "{{ terraform_config_home }}/{{ item.key }}/terraform-modules/terragrunt-state-role/main.tf"
-  vars:
-    state_bucket_name: "{{ item.value }}-state"
-    dynamodb_table_name: "{{ item.value }}-lock"
-  loop: "{{ configs|dict2items }}"
-
-- name: create README.md
-  template:
-    src: README.md.j2
-    dest: "{{ terraform_config_home }}/{{ item.key }}/README.md"
-  vars:
-    terragrunt_state_path: "{{ terraform_config_home }}/{{ item.key }}/{{ item.value }}-state"
-    config_name: "{{ item.value }}"
-    state_bucket_name: "{{ item.value }}-state"
-    dynamodb_table_name: "{{ item.value }}-lock"
-  loop: "{{ configs|dict2items }}"
+  loop_control:
+    loop_var: item
