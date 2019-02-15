@@ -1,3 +1,7 @@
+# Example IAM role and policy for the terragrunt user
+#
+# It's strongly recommended that you edit this to fit your deployment!
+
 provider "aws" {
   region = "${var.aws_region}"
 }
@@ -20,40 +24,21 @@ resource "aws_iam_role_policy" "terragrunt_iam_policy" {
       "Resource": "*"
     },
     {
-      "Sid": "AllowTerragruntToAddIAMRolesAndPolicies",
-      "Effect": "Allow",
+      "Sid": "DenySpecificResources",
       "Action": [
-        "iam:ListGroupPolicies",
-        "iam:ListEntitiesForPolicy",
-        "iam:ListRoles",
-        "iam:ListUserPolicies",
-        "iam:ListInstanceProfiles",
-        "iam:ListPolicyVersions",
-        "iam:ListGroupsForUser",
-        "iam:ListUsers",
-        "iam:ListGroups",
-        "iam:ListRoleTags",
-        "iam:ListPoliciesGrantingServiceAccess",
-        "iam:ListAttachedRolePolicies",
-        "iam:ListAttachedUserPolicies",
-        "iam:ListAttachedGroupPolicies",
-        "iam:ListRolePolicies",
-        "iam:ListPolicies",
-        "iam:ListInstanceProfilesForRole",
-        "iam:GetRole",
-        "iam:GetInstanceProfile",
-        "iam:GetUser",
-        "iam:GetRolePolicy",
-        "iam:CreateRole",
-        "iam:CreateInstanceProfile",
-        "iam:AttachRolePolicy",
-        "iam:PutRolePolicy",
-        "iam:AddRoleToInstanceProfile",
-        "iam:RemoveRoleFromInstanceProfile",
-        "iam:DeleteRolePolicy",
-        "iam:DeleteRole",
-        "iam:DeleteInstanceProfile"
+        "iam:*User*",
+        "iam:*Login*",
+        "iam:*Group*",
+        "iam:*Provider*",
+        "aws-portal:*",
+        "budgets:*",
+        "config:*",
+        "directconnect:*",
+        "aws-marketplace:*",
+        "aws-marketplace-management:*",
+        "ec2:*ReservedInstances*"
       ],
+      "Effect": "Deny",
       "Resource": "*"
     }
   ]
